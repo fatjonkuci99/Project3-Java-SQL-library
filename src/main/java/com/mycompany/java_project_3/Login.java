@@ -24,7 +24,7 @@ Infromatike Java
 Fillimisht nje perdorues i ri duhet te regjistrohet dhe te krijoje nje llogari 
 (te gjitha llogarite ruhen ne nje database), ose ne rast te nje perdoruesi 
 ekzistues te dhenat e tij/saj i japin akses nje librarie, ne te cilen mund te 
-shtosh ose te modifikosh libart ekzistues
+shtosh ose te modifikosh librat ekzistues.
  */
 public class Login extends javax.swing.JFrame {
 
