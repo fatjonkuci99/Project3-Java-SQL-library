@@ -15,9 +15,16 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author Fatjon
+/*
+Librari e ruajtur ne database, se bashktu me nje log in form
+Authors: Fatjon Kuci, Florjan Hysaj, Isarda Kuci, Zllatan Keraj 
+Viti II 
+Infromatike Java 
+02.05.2021 
+Fillimisht nje perdorues i ri duhet te regjistrohet dhe te krijoje nje llogari 
+(te gjitha llogarite ruhen ne nje database), ose ne rast te nje perdoruesi 
+ekzistues te dhenat e tij/saj i japin akses nje librarie, ne te cilen mund te 
+shtosh ose te modifikosh libart ekzistues
  */
 public class Login extends javax.swing.JFrame {
 
@@ -148,6 +155,7 @@ public class Login extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         new Register().setVisible(true);
+        dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
