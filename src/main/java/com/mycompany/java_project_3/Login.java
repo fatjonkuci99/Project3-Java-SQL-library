@@ -34,8 +34,6 @@ public class Login extends javax.swing.JFrame {
     PreparedStatement pst=null;
     ResultSet rs=null;
     boolean db_exist=false;
-    boolean tab1_exist=false;
-    boolean tab2_exist=false;
     int clicked=0;
     
     static Connection Connector(){
@@ -62,9 +60,9 @@ public class Login extends javax.swing.JFrame {
                 }
             }
             if(!db_exist){
-                String sql="create database JavaProject;";
-                stm=conn.createStatement();
-                stm.executeUpdate(sql);
+                    String sql="create database JavaProject;";
+                    stm=conn.createStatement();
+                    stm.executeUpdate(sql);
             }
         }
         catch(Exception e){
@@ -82,10 +80,7 @@ public class Login extends javax.swing.JFrame {
             conn=Connector();
             DatabaseMetaData dbm = conn.getMetaData();
             ResultSet table1 = dbm.getTables(null, null, "perdorues", null);
-            if (table1.next()) {
-                tab1_exist=true;
-            }
-            if(!tab1_exist){
+            if (!table1.next()) {
                 String sql="CREATE TABLE `perdorues` (\n" 
                 +"  `username` varchar(30) NOT NULL,\n" 
                 +"  `password` varchar(30) DEFAULT NULL,\n" 
@@ -109,10 +104,7 @@ public class Login extends javax.swing.JFrame {
             conn=Connector();
             DatabaseMetaData dbm2 = conn.getMetaData();
             ResultSet table2 = dbm2.getTables(null, null, "librari", null);
-            if (table2.next()) {
-                tab2_exist=true;
-            }
-            if(!tab2_exist){
+            if (!table2.next()) {
                 String sql="CREATE TABLE `librari` (\n" 
                 +"  `ID` int NOT NULL,\n" 
                 +"  `Titulli` varchar(70) DEFAULT NULL,\n" 
@@ -128,9 +120,7 @@ public class Login extends javax.swing.JFrame {
                 stm2=conn.createStatement();
                 stm.executeUpdate(sql);
                 stm2.executeUpdate(sql2);
-            }
-            if(tab1_exist&&tab2_exist){
-                JOptionPane.showMessageDialog(null,"Duhet te fshini tabelat 'Librari' dhe 'Perdorues'");
+                
             }
         }
         catch(Exception e){
@@ -146,7 +136,7 @@ public class Login extends javax.swing.JFrame {
     public Login() {
         initComponents();
         datacreate();
-                datacreate2();
+        datacreate2();
         datacreate3();
 
     }
@@ -168,11 +158,6 @@ public class Login extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowOpened(java.awt.event.WindowEvent evt) {
-                formWindowOpened(evt);
-            }
-        });
 
         jLabel1.setText("Perdoruesi");
 
@@ -279,12 +264,6 @@ public class Login extends javax.swing.JFrame {
         new Register().setVisible(true);
         dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        if(tab1_exist||tab2_exist){
-            dispose();
-        }
-    }//GEN-LAST:event_formWindowOpened
 
     /**
      * @param args the command line arguments
