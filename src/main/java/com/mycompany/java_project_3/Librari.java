@@ -1,51 +1,68 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.mycompany.java_project_3;
 
 import java.sql.*;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author Fatjon
- */
 public class Librari extends javax.swing.JFrame {
     
-    static final String DB="jdbc:mysql://127.0.0.1:3306/perdorues";
+    static final String DB="jdbc:mysql://127.0.0.1:3306/JavaProject";
     static final String User="root";
     static final String Pass="Java1234";
-    static int ID=5;
+    static int ID;
     Connection conn=null;
     Statement stm=null;
+    Statement stm2=null;
     PreparedStatement pst=null;
     ResultSet rs=null;
-   
+    ResultSet rs2=null;
+    
+    static Connection Connector(){
+        try{
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection connec=DriverManager.getConnection(DB, User, Pass);
+        return connec;
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(null,e);
+            return null;
+        }     
+    }
+    
+    private void updateTable(){
+        try{
+            conn=Connector();
+            stm2 = conn.createStatement();
+            rs2 = stm2.executeQuery("SELECT COUNT(*) AS rowcount FROM Librari");
+            rs2.next();
+            ID = rs2.getInt("rowcount") ;
+            stm=conn.createStatement();
+            rs=stm.executeQuery("select * from Librari");
+            DefaultTableModel tm=(DefaultTableModel)jTable1.getModel();
+            tm.setRowCount(0);
+            while(rs.next()){
+                Object o[]={rs.getInt("id"),rs.getString("titulli"),rs.getInt("isbn"),rs.getString("autori"),rs.getInt("vit_botimit"),rs.getString("shtepia_botuese"),rs.getInt("cmimi"),rs.getInt("numri_kopjeve")};
+                tm.addRow(o);
+            }
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(null, e);
+        }
+        finally{
+            try { rs.close(); } catch (Exception e) { /* Ignored */ }
+            try { stm.close(); } catch (Exception e) { /* Ignored */ }
+            try { rs2.close(); } catch (Exception e) { /* Ignored */ }
+            try { stm2.close(); } catch (Exception e) { /* Ignored */ }
+            try { conn.close(); } catch (Exception e) { /* Ignored */ }
+        }
+    }
 
     public Librari() {
         initComponents();
         updateTable();
     }
     
-    private void updateTable(){
-        try{
-        conn=DriverManager.getConnection(DB, User, Pass);
-        stm=conn.createStatement();
-        rs=stm.executeQuery("select * from librari");
-        DefaultTableModel tm=(DefaultTableModel)jTable1.getModel();
-        tm.setRowCount(0);
-        while(rs.next()){
-            Object o[]={rs.getInt("id"),rs.getString("titulli"),rs.getInt("isbn"),rs.getString("autori"),rs.getInt("vit_botimit"),rs.getString("shtepia_botuese"),rs.getInt("cmimi"),rs.getInt("numri_kopjeve")};
-            tm.addRow(o);
-            }
-        }
-        catch(Exception e){
-            JOptionPane.showMessageDialog(null, e);
-        }
-    }
+   
    
     /**
      * This method is called from within the constructor to initialize the form.
@@ -217,15 +234,11 @@ public class Librari extends javax.swing.JFrame {
         String shtepi_bot=jTextField5.getText();
         int cmimi=Integer.parseInt(jTextField6.getText());
         int nr=Integer.parseInt(jTextField7.getText());
-        
-        String sql="insert into librari values ("+id+",'"+titulli+"',"+isbn+",'"+autor+"',"+vit+",'"+shtepi_bot+"',"+cmimi+","+nr+")";
-
+        String sql="insert into Librari values ("+id+",'"+titulli+"',"+isbn+",'"+autor+"',"+vit+",'"+shtepi_bot+"',"+cmimi+","+nr+")";
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            conn=DriverManager.getConnection(DB, User, Pass);
+            conn=Connector();
             stm=conn.createStatement();
             stm.executeUpdate(sql);
-            
             JOptionPane.showMessageDialog(null,"Vendosja u krye me sukses.");
             updateTable();
             jTextField1.setText("");
@@ -234,20 +247,22 @@ public class Librari extends javax.swing.JFrame {
             jTextField4.setText("");
             jTextField5.setText("");
             jTextField6.setText("");
-            jTextField7.setText("");
-            
+            jTextField7.setText("");  
         }
-        
         catch(Exception e){
             JOptionPane.showMessageDialog(null, e);
         }
-        
+        finally{   
+            try { stm.close(); } catch (Exception e) { /* Ignored */ }
+            try { conn.close(); } catch (Exception e) { /* Ignored */ }
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         int row = jTable1.getSelectedRow();
-        String sql="select * from librari where id = "+ jTable1.getModel().getValueAt(row,0).toString();
+        String sql="select * from Librari where id = "+ jTable1.getModel().getValueAt(row,0).toString();
         try{
+            conn=Connector();
             pst=conn.prepareStatement(sql);
             rs=pst.executeQuery();
             if(rs.next()){
@@ -263,13 +278,16 @@ public class Librari extends javax.swing.JFrame {
         catch(Exception e){
             JOptionPane.showMessageDialog(null, e);
         }
-        
-           
+        finally{
+            try { rs.close(); } catch (Exception e) { /* Ignored */ }
+            try { pst.close(); } catch (Exception e) { /* Ignored */ }
+            try { conn.close(); } catch (Exception e) { /* Ignored */ }
+        }    
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         int row = jTable1.getSelectedRow();
-        String sql="update librari set "
+        String sql="update Librari set "
                 + " titulli='"+jTextField1.getText()+"',"
                 + " isbn='"+jTextField2.getText()+"',"
                 + " autori='"+jTextField3.getText()+"',"
@@ -279,6 +297,7 @@ public class Librari extends javax.swing.JFrame {
                 + " numri_kopjeve='"+jTextField7.getText()+"'"
                 + " where id="+ jTable1.getModel().getValueAt(row,0).toString();
         try{
+            conn=Connector();
             pst=conn.prepareStatement(sql);
             pst.execute();
             JOptionPane.showMessageDialog(null, "Modifikimi u krye me sukses.");
@@ -295,7 +314,10 @@ public class Librari extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, e);
         }
                 
-                
+        finally{   
+            try { pst.close(); } catch (Exception e) { /* Ignored */ }
+            try { conn.close(); } catch (Exception e) { /* Ignored */ }           
+        }
                 
     }//GEN-LAST:event_jButton2ActionPerformed
 
