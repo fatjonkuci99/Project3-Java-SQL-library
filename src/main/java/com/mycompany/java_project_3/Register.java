@@ -1,13 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.mycompany.java_project_3;
 
-import static com.mycompany.java_project_3.Login.DB;
-import static com.mycompany.java_project_3.Login.Pass;
-import static com.mycompany.java_project_3.Login.User;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -15,13 +7,9 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author Fatjon
- */
 public class Register extends javax.swing.JFrame {
     
-    static final String DB="jdbc:mysql://127.0.0.1:3306/perdorues";
+    static final String DB="jdbc:mysql://127.0.0.1:3306/JavaProject";
     static final String User="root";
     static final String Pass="Java1234";
     Connection conn=null;
@@ -29,9 +17,18 @@ public class Register extends javax.swing.JFrame {
     PreparedStatement pst=null;
     ResultSet rs=null;
 
-    /**
-     * Creates new form Register
-     */
+    static Connection Connector(){
+        try{
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection connec=DriverManager.getConnection(DB, User, Pass);
+        return connec;
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(null,e);
+            return null;
+        }     
+    }
+    
     public Register() {
         initComponents();
     }
@@ -114,10 +111,8 @@ public class Register extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            conn=DriverManager.getConnection(DB, User, Pass);
-            PreparedStatement pst2=null;
-            String sql="select username, password from perdorues where username LIKE '%"+jTextField1.getText()+"'";
+            conn=Connector();
+            String sql="select username, password from Perdorues where username LIKE '%"+jTextField1.getText()+"'";
             pst=conn.prepareStatement(sql);
             rs=pst.executeQuery();
             if(rs.next()){
@@ -129,7 +124,7 @@ public class Register extends javax.swing.JFrame {
                 if(enteredPsw.equals(repeatPsw)){
                     JOptionPane.showMessageDialog(null,"Llogaria u hap me sukses.");
                     String uname=jTextField1.getText();
-                    String sql2="insert into perdorues values ('"+uname+"', '"+enteredPsw+"')";
+                    String sql2="insert into Perdorues values ('"+uname+"', '"+enteredPsw+"')";
                     stm=conn.createStatement();
                     stm.executeUpdate(sql2);
                     new Librari().setVisible(true);
@@ -137,12 +132,16 @@ public class Register extends javax.swing.JFrame {
                 }
                 else
                     JOptionPane.showMessageDialog(null,"Password-et nuk jane njesoj.");
-            }
-            
-            
+            }  
         }
         catch(Exception e){
             JOptionPane.showMessageDialog(null,e);
+        }
+        finally{
+            try { rs.close(); } catch (Exception e) { /* Ignored */ }
+            try { pst.close(); } catch (Exception e) { /* Ignored */ }
+            try { stm.close(); } catch (Exception e) { /* Ignored */ }
+            try { conn.close(); } catch (Exception e) { /* Ignored */ }
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
