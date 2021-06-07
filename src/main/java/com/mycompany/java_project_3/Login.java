@@ -1,18 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.mycompany.java_project_3;
 
-import static com.mycompany.java_project_3.Librari.DB;
-import static com.mycompany.java_project_3.Librari.Pass;
-import static com.mycompany.java_project_3.Librari.User;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.DatabaseMetaData;
 import javax.swing.JOptionPane;
 
 /*
@@ -28,18 +21,134 @@ shtosh ose te modifikosh librat ekzistues.
  */
 public class Login extends javax.swing.JFrame {
 
-    static final String DB="jdbc:mysql://127.0.0.1:3306/perdorues";
+    static final String DB1="jdbc:mysql://127.0.0.1:3306/perdor";
     static final String User="root";
     static final String Pass="Java1234";
+    static final String DB="jdbc:mysql://127.0.0.1:3306/JavaProject";
     Connection conn=null;
+    Connection conn1=null;
     Statement stm=null;
+    Statement stm2=null;
+    Statement stm3=null;
+    Statement stm4=null;
     PreparedStatement pst=null;
     ResultSet rs=null;
-    /**
-     * Creates new form Login
-     */
+    boolean db_exist=false;
+    boolean tab1_exist=false;
+    boolean tab2_exist=false;
+    int clicked=0;
+    
+    static Connection Connector(){
+        try{
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection connec=DriverManager.getConnection(DB, User, Pass);
+        return connec;
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(null,e);
+            return null;
+        }     
+    }
+    
+    private void datacreate(){
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            conn=DriverManager.getConnection(DB1, User, Pass);
+            rs=conn.getMetaData().getCatalogs();
+            while(rs.next()){
+                String dbname=rs.getString(1);
+                if(dbname.equals("javaproject")){
+                    db_exist=true;
+                }
+            }
+            if(!db_exist){
+                String sql="create database JavaProject;";
+                stm=conn.createStatement();
+                stm.executeUpdate(sql);
+            }
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(null,e);
+        }
+        finally{
+            try { rs.close(); } catch (Exception e) { /* Ignored */ }
+            try { stm.close(); } catch (Exception e) { /* Ignored */ }
+            try { conn.close(); } catch (Exception e) { /* Ignored */ }
+        }
+    }
+    
+    private void datacreate2(){
+        try{
+            conn=Connector();
+            DatabaseMetaData dbm = conn.getMetaData();
+            ResultSet table1 = dbm.getTables(null, null, "perdorues", null);
+            if (table1.next()) {
+                tab1_exist=true;
+            }
+            if(!tab1_exist){
+                String sql="CREATE TABLE `perdorues` (\n" 
+                +"  `username` varchar(30) NOT NULL,\n" 
+                +"  `password` varchar(30) DEFAULT NULL,\n" 
+                +"  PRIMARY KEY (`username`)\n" 
+                +") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
+                stm=conn.createStatement();
+                stm.executeUpdate(sql);
+            }
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(null,e);
+        }
+        finally{
+            try { stm.close(); } catch (Exception e) { /* Ignored */ }
+            try { conn.close(); } catch (Exception e) { /* Ignored */ }
+        }
+    }
+    
+    private void datacreate3(){
+        try{
+            conn=Connector();
+            DatabaseMetaData dbm2 = conn.getMetaData();
+            ResultSet table2 = dbm2.getTables(null, null, "librari", null);
+            if (table2.next()) {
+                tab2_exist=true;
+            }
+            if(!tab2_exist){
+                String sql="CREATE TABLE `librari` (\n" 
+                +"  `ID` int NOT NULL,\n" 
+                +"  `Titulli` varchar(70) DEFAULT NULL,\n" 
+                +"  `ISBN` int DEFAULT NULL,\n" 
+                +"  `Autori` varchar(70) DEFAULT NULL,\n" 
+                +"  `Vit_botimit` int DEFAULT NULL,\n" 
+                +"  `Shtepia_botuese` varchar(40) DEFAULT NULL,\n" 
+                +"  `Cmimi` int DEFAULT NULL,\n" 
+                +"  `Numri_kopjeve` int DEFAULT NULL,\n" 
+                +"  PRIMARY KEY (`ID`)\n" +") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
+                String sql2="insert into librari values (1,'The Brothers Karamazov',14044924,'Fyodor Dostoyevsky',1880,'Penguin',8,4), (2,'The Great Gatsby',908312703,'Francis Fitzgerald',1925,'Harper Collins',6,4), (3,'To Kill A Mockingbird',312578865,'Harper Lee',1966,'Klett',9,4), (4,'The Catcher in the Rye',24198475,'J.D. Salinger',1946,'Penguin',12,5), (5,'1984',373060976,'George Orwell',1949,'Hachette',7,2);";
+                stm=conn.createStatement();
+                stm2=conn.createStatement();
+                stm.executeUpdate(sql);
+                stm2.executeUpdate(sql2);
+            }
+            if(tab1_exist&&tab2_exist){
+                JOptionPane.showMessageDialog(null,"Duhet te fshini tabelat 'Librari' dhe 'Perdorues'");
+            }
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(null,e);
+        }
+        finally{
+            try { stm.close(); } catch (Exception e) { /* Ignored */ }
+            try { stm2.close(); } catch (Exception e) { /* Ignored */ }
+            try { conn.close(); } catch (Exception e) { /* Ignored */ }
+        }
+    }
+
     public Login() {
         initComponents();
+        datacreate();
+                datacreate2();
+        datacreate3();
+
     }
 
     /**
@@ -59,6 +168,11 @@ public class Login extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         jLabel1.setText("Perdoruesi");
 
@@ -93,9 +207,7 @@ public class Login extends javax.swing.JFrame {
                                     .addComponent(jLabel1)
                                     .addGap(18, 18, 18)
                                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel2)
-                                    .addGap(144, 144, 144)))))
+                                .addComponent(jLabel2))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(72, 72, 72)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -126,8 +238,7 @@ public class Login extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            conn=DriverManager.getConnection(DB, User, Pass);
+            conn=Connector();
             String sql="select username, password from perdorues where username LIKE '%"+jTextField1.getText()+"'";
             pst=conn.prepareStatement(sql);
             rs=pst.executeQuery();
@@ -138,17 +249,28 @@ public class Login extends javax.swing.JFrame {
                     new Librari().setVisible(true);
                     dispose();
                 }
-                else
-                    JOptionPane.showMessageDialog(null,"Password i gabuar.");
+                else{
+                    clicked++;
+                    if(clicked>=3){
+                        JOptionPane.showMessageDialog(null,"Gabuat 3 here");
+                        dispose();
+                    }
+                    else{
+                       JOptionPane.showMessageDialog(null,"Password i gabuar.");
+                    }
+                }
             }
             else{
                 JOptionPane.showMessageDialog(null,"Ky perdorues nuk ekzistion.");
             }
-            
-            
         }
         catch(Exception e){
             JOptionPane.showMessageDialog(null,e);
+        } 
+        finally{
+            try { rs.close(); } catch (Exception e) { /* Ignored */ }
+            try { pst.close(); } catch (Exception e) { /* Ignored */ }
+            try { conn.close(); } catch (Exception e) { /* Ignored */ }
         }
         
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -157,6 +279,12 @@ public class Login extends javax.swing.JFrame {
         new Register().setVisible(true);
         dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        if(tab1_exist||tab2_exist){
+            dispose();
+        }
+    }//GEN-LAST:event_formWindowOpened
 
     /**
      * @param args the command line arguments
